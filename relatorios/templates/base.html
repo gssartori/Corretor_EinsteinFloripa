@@ -1,0 +1,16 @@
+<!-- {% load static %} -->  <!--Caso existam arquivos estáticos na página-->
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Corretor de Relatórios</title>
+    <link rel="stylesheet" href="{% static '_css/style.css' %}">
+</head>
+
+{% include 'partials/menu.html' %}
+
+<body>
+    {% block content %} {% endblock %}
+</body>
+</html>

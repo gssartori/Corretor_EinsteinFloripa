@@ -1,0 +1,87 @@
+body {
+    background-color: #ddd;
+    line-height: 1.5;
+  }
+
+h1 {
+    color: black;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+p {
+   font-family: 'Courier New', Courier, monospace;
+   font-size: 20px;
+}
+
+
+logo {
+    margin-left: 85%;
+    padding: 5px;
+    width: 150px;
+  }
+
+.header{
+    align-items: center;
+}
+.button {
+    margin-left: 10px;
+    background-color: #5487c2;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    opacity: 0.7;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+.button:hover {opacity: 1}
+
+.container {
+    position: relative;
+}
+
+.tablesubcontainer{
+    position: relative;
+    margin: 10px;
+}
+
+.foot{
+    position: absolute;
+    margin-top: 90%;
+    text-align: left;
+    font-size: 18px;
+    background: #5487c2;
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+}
+
+.customers{
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+td, th {
+    padding: 8px;
+  }
+
+tr:nth-child(even){background-color: #f2f2f2;}
+
+tr:hover {background-color: #ddd;}
+
+th {
+    text-align: left;
+    background-color: #5487c2;
+    color: white;
+  }

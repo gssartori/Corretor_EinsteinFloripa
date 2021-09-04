@@ -1,0 +1,6 @@
+{
+  "Nome": ["Sartori", "Sandin", "Machado", "Ana"],
+  "Status": ["Não Gerado", "Não Enviado", "Enviando", "Enviado"],
+  "Email": ["sartori@autojun.br", "sandin@autojun.br", "ana@autojun.br", "machado@autojun.br"],
+  "Data": ["28/08/2021", "28/08/2021", "28/08/2021", "28/08/2021"]
+}
