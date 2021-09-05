@@ -1,7 +1,7 @@
 {% extends 'base.html' %}           <!--estender tudo do base.html-->
 {% load static %}                   <!--Caso existam arquivos estáticos na página-->
 
-{% block content %}                 <!-- bloco base.html começa aqui -->
+{% block base_content %}                 <!-- bloco base.html começa aqui -->
     <img class="logo" src="{% static '_img/logo.png'%}">
 
     <h1>Relatórios</h1>
@@ -16,9 +16,7 @@
         </form>
 
         {% if url %}
-            <p> Ver informações do Eduqo:
-                <a href="{{ url }}">{{url}}</a>
-            </p>
+            <p> Ver informações do Eduqo:   <a href="{{ url }}">{{url}}</a>     </p>
         {% endif %}
 
         <div class="tablesubcontainer">
@@ -32,18 +30,20 @@
 
                 <tbody>
                 {% if relatorios %}
-                    {% for relatorio in relatorios %}
+                {% for aluno in relatorios %}
+                <br>
                     <tr>
                         <!-- CRIAR UM IF QUE VERIFICA O STATUS -->
-                        <td>{{ relatorio.nome_aluno }}</td>
-                        <td>{{ relatorio.email }}</td>
-                        <td>{{ relatorio.status }}</td>
-                        <td>{{ relatorio.data_envio }}</td>
+                        <td>{{ aluno.Nome }}</td>
+                        <td>{{ aluno.Email }}</td>
+                        <td>{{ aluno.Status }}</td>
+                        <td>{{ aluno.Data }}</td>
                     </tr>
                     {% endfor %}
                 {% else %}
                 {% endif %}
                 </tbody>
+
             </table>
 
         </div>

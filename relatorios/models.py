@@ -5,11 +5,12 @@ from django.core.files.storage import FileSystemStorage
 # Create your models here.
 
 class Relatorio(models.Model):
-    nome_aluno = models.CharField(max_length=255, primary_key=True, blank=False)
-    email = models.CharField(max_length=255, blank=False)
-    descricao_status = models.CharField(max_length=255)
-    status = models.CharField(max_length=50)
-    data_envio = models.DateTimeField(default=datetime.now, blank=True)
+    # nome_aluno = models.CharField(max_length=255, primary_key=True, blank=False)
+    # email = models.CharField(max_length=255, blank=False)
+    # descricao_status = models.CharField(max_length=255)
+    # status = models.CharField(max_length=50)
+    # data_envio = models.DateTimeField(default=datetime.now, blank=True)
+    pass
 
 
 class NovoStorage(FileSystemStorage):
