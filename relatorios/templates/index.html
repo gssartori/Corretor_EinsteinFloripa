@@ -5,15 +5,21 @@
     <img class="logo" src="{% static '_img/logo.png'%}">
 
     <h1>Relatórios</h1>
-    <h2>Subtitulo</h2>
+
+
+    {% if alertas %}
+        {% include 'partials/alerta.html' %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="planilha">
+        <button type="submit">Fazer Upload</button>
+    </form>
 
     <div class="container">
+
         <button class="button">Gerar e Enviar Relatórios</button>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="file" name="planilha">
-            <button type="submit">Fazer Upload</button>
-        </form>
 
         {% if url %}
             <p> Ver informações do Eduqo:   <a href="{{ url }}">{{url}}</a>     </p>
@@ -30,14 +36,14 @@
 
                 <tbody>
                 {% if relatorios %}
-                {% for aluno in relatorios %}
+                {% for relatorio in relatorios %}
                 <br>
                     <tr>
                         <!-- CRIAR UM IF QUE VERIFICA O STATUS -->
-                        <td>{{ aluno.Nome }}</td>
-                        <td>{{ aluno.Email }}</td>
-                        <td>{{ aluno.Status }}</td>
-                        <td>{{ aluno.Data }}</td>
+                        <td>{{ relatorio.Nome }}</td>
+                        <td>{{ relatorio.Email }}</td>
+                        <td>{{ relatorio.Status }}</td>
+                        <td>{{ relatorio.Data }}</td>
                     </tr>
                     {% endfor %}
                 {% else %}
