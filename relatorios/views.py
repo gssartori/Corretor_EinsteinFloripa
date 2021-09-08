@@ -16,6 +16,7 @@ def index(request):
 
         if arquivo_recebido:
             utils.escreve_arquivo(arquivo_recebido)
+            utils.memo.clear()
 
         return HttpResponseRedirect(reverse('index'))
 
@@ -23,13 +24,8 @@ def index(request):
         # nome_arquivo = arquivo_armazenado.save('dados.json', arquivo_recebido)
         # arquivo_json = trata_arquivo(nome_arquivo)
         # dados['url'] = arquivo_armazenado.url(nome_arquivo)
-        # print("ERROR!!! Coloque um arquivo com tipo válido: \n 'xls', 'xlsx', 'xlsm', 'xlsb', 'odf', 'ods', 'odt', 'json', 'csv'")
-        # dados['type_error'] = "Insira um arquivo com tipo válido: \n 'xls', 'xlsx', 'xlsm', 'xlsb', 'odf', 'ods', 'odt', 'json', 'csv'"
     dados['relatorios'] = utils.le_arquivo()[0]['relatorios']
     if utils.alertas:
         dados['alertas'] = utils.alertas
 
-    # status_relatorio = pd.read_json('dados.json')
-    # if not status_relatorio.empty:
-    #     dados['relatorio'] = status_relatorio
     return render(request, 'index.html', dados)

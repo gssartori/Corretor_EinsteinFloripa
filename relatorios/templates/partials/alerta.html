@@ -1,6 +1,7 @@
 {% load static %}
 
 {% for alerta in alertas %}
+    <a id="acionador" href="#alerta"></a>
 
     <div id="alerta" class="overlay">
       <div class="popup">
@@ -11,5 +12,10 @@
         </div>
       </div>
     </div>
+
+    <!-- Script aciona alerta -->
+    <script type="text/javascript">
+	    document.getElementById('acionador').click();
+    </script>
 
 {% endfor %}

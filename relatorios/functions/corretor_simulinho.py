@@ -1,8 +1,8 @@
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader
-from emails import constroi_email, logout_email
-#from flask import url_for
-#import numpy as np
+from flask import url_for
+# import numpy as np
+from relatorios.functions.emails import constroi_email
 
 
 # funções pra colorir as tabelas
@@ -157,8 +157,9 @@ for aluno in df_q.index.get_level_values(0).unique():
 
     # renderiza o html a partir do template e com as informações do dicionário
     html_out = template.render(doc)
+
+    ###### EDIT #######
+    # constroi_email(file, doc['nome'], 'gabriel.s@autojun.com.br')
+
     with open(f"html-alunos/{aluno.replace(' ', '_')}.html", 'w') as file:
         file.write(html_out)
-        constroi_email(file, doc['nome'], 'gabriel.s@autojun.com.br')
-
-logout_email()
