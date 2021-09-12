@@ -1,0 +1,168 @@
+<!--
+
+    basicamente, cada tabela que vai ser printada é um DataFrame que já veio formatado
+    (cores e dados tudo certinho). aí é só printar os gráficos e as tabelas na ordem
+
+-->
+
+
+<html lang="pt-br">
+    <head>
+      <page size="A4"></page>
+      <meta charset="windows-1252" />
+      <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+      <style>
+
+        @font-face {
+            font-family: "Roboto", sans-serif;
+            src: url("../../fonts/Roboto/Roboto-Regular.ttf") format("truetype");
+        }
+
+        @font-face {
+            font-family: "Impact";
+            src: url("../../fonts/Impact/impact.ttf") format("truetype");
+        }
+
+        @page {
+            size: A4;
+        }
+
+        .section {
+            border: 0;
+            height: 5px;
+            background-color: #286BA2;
+        }
+
+        .title {
+            font-family: 'Impact';
+            color: #1D74A7;
+            text-align: center
+        }
+
+        .title_roxo {
+            font-family: 'Roboto', sans-serif;
+            color: #533884;
+            text-align: center
+        }
+
+        .header img {
+            float: left;
+            width: 6cm;
+            height: auto;
+        }
+
+        .header h1,
+        h3 {
+            position: relative;
+        }
+
+        .graphic {
+            width: 15cm;
+            height: auto;
+            position: relative;
+        }
+
+        .graphics-row {
+            display: inline;
+            align-content: center;
+        }
+
+        .graphics-col {
+            align-content: center;
+        }
+
+        .caption {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .numeric_grade_p {
+            font-family: 'Roboto', sans-serif;
+            text-align: left;
+        }
+
+        .numeric_grade h1 {
+            float: left;
+            position: relative;
+            margin-top: -5.5mm;
+            font-size: 3.5em;
+        }
+
+        .question_title {
+            font-family: 'Roboto', sans-serif;
+            color: #533884;
+            font-weight: bold;
+        }
+
+        .intro_text {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .small_text {
+            font-family: 'Roboto', sans-serif;
+            font-size: small;
+        }
+
+        .container{
+            display: flex;
+        }
+        .fixed{
+            width: 200px;
+        }
+        .flex-item{
+            flex-grow: 1;
+        }
+    </style>
+
+</head>
+<body>
+    <div class='header'>
+        <img src='https://storage.googleapis.com/atados-v3/user-uploaded/images-medium/0dbb770a-31e3-4385-9025-a81379a67547.png'/>
+        <center>
+            <h1 class='title'>{{ document_title }}</h1>
+            <h2 class='title_roxo'>{{ nome }}</h2>
+        </center>
+    </div>
+    <br>
+
+    <p class='intro_text'>
+        Olá, {{ nome.split(' ')[0].title()}}! <br>
+        <br>
+        Esta é a correção do seu Simulinho. Aqui você confere sua porcentagem de acerto em cada matéria e seu desempenho em relação aos outros colegas do Einstein, além da correção de cada questão. <br>
+        <br> Você ficou em {{colocacao | safe}}º lugar!
+        <br>
+        Bons estudos!
+        <br>
+        <br>
+    </p>
+
+
+    <hr class='section'>
+
+    <center><h2 class='title'>Desempenho Geral</h2></center>
+    <center>{{notas | safe}}</center>
+    <br><br><br>
+    <hr class='section'>
+
+
+    <center><h2 class='title'>Redação</h2></center>
+    <center>{{redacao | safe}}</center>
+    <center>{{comentario | safe}} </center>
+    <br><br><br>
+    <!--<center>
+    <figure> É GRPAFICO, SIMULINHO NÃO TEM
+        <img src= "{{grafico_path | safe}}"/>
+    </figure>
+
+
+    </center>-->
+
+    <hr class='section'>
+
+    {% for m in materias %}
+    <center><h2 class='title'>Questões de {{m.materia}}</h2></center>
+    <center>{{m.df | safe}}</center>
+    <br><br><br>
+    {% endfor %}
+
+</body>
+</html>

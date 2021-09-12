@@ -1,7 +1,7 @@
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader
 from flask import url_for
-# import numpy as np
+import numpy as np
 from relatorios.functions.emails import constroi_email
 
 
@@ -55,9 +55,7 @@ env = Environment(loader=FileSystemLoader('.'))
 template = env.get_template("relatorio-alunos/simulinho_aluno_template.html")
 
 # cria um dicionário com as variáveis pro template
-doc = {
-    'document_title': 'Correção SIMULINHO 2021'
-}
+doc = { 'document_title': 'Correção SIMULINHO 2021' }
 
 # pra cada aluno
 for aluno in df_q.index.get_level_values(0).unique():
@@ -158,8 +156,14 @@ for aluno in df_q.index.get_level_values(0).unique():
     # renderiza o html a partir do template e com as informações do dicionário
     html_out = template.render(doc)
 
-    ###### EDIT #######
-    # constroi_email(file, doc['nome'], 'gabriel.s@autojun.com.br')
-
     with open(f"html-alunos/{aluno.replace(' ', '_')}.html", 'w') as file:
         file.write(html_out)
+
+    ###### EDIT #######
+    with open(f"html-alunos/{aluno.replace(' ', '_')}.html", 'r') as file:
+        """
+        Arquivo armazenado é enviado como parâmetro para a função 'constroi_email',
+        para que o email seja enviado
+        """
+        # constroi_email(pdf_aluno, nome_aluno, email_destino)
+        constroi_email(file, doc['nome'], 'gabriel.s@autojun.com.br')
