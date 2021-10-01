@@ -2,7 +2,7 @@
 {% load static %}                   <!--Caso existam arquivos estáticos na página-->
 
 {% block base_content %}                 <!-- bloco base.html começa aqui -->
-    <img class="logo" src="{% static '_img/logo.png'%}">
+
 
     <h1>Relatórios</h1>
 
@@ -13,13 +13,15 @@
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <input type="file" name="planilha">
-        <button type="submit">Fazer Upload</button>
+        <label for="upload-arquivos-pickle" class="upload-arquivos">Selecionar Arquivos</label>
+ 		<input type="file" name="dados_simulinho" id="upload-arquivos-pickle" multiple>
+        <button type="submit" class="upload-submit">Fazer Upload</button>
     </form>
 
     <div class="container">
-
-        <button class="button">Gerar e Enviar Relatórios</button>
+        <form action="/envia_relatorios">
+            <button class="button" onclick="">Gerar e Enviar Relatórios</button>
+        </form>
 
         {% if url %}
             <p> Ver informações do Eduqo:   <a href="{{ url }}">{{url}}</a>     </p>
@@ -38,14 +40,13 @@
                 <tbody>
                 {% if relatorios %}
                 {% for relatorio in relatorios %}
-                <br>
-                    <tr>
-                        <!-- CRIAR UM IF QUE VERIFICA O STATUS -->
+                    <tr class="{{ relatorio.Status }}">
                         <td>{{ relatorio.Nome }}</td>
                         <td>{{ relatorio.Email }}</td>
-                        <td>{{ relatorio.Status }}</td>
+                        <td id="{{ relatorio.Nome }}">
+                            {{ relatorio.Status }}
+                        </td>
                         <td>{{ relatorio.Data }}</td>
-
                     </tr>
                     {% endfor %}
                 {% else %}
@@ -56,6 +57,10 @@
 
         </div>
     </div>
-
     <div class="foot"></div>
+{% block js %}
+
+{% endblock js %}
+
 {% endblock %}              <!-- bloco base.html termina aqui -->
+

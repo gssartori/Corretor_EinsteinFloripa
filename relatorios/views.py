@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from .models import Relatorio, NovoStorage
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.urls import reverse
 from django.core.files.storage import FileSystemStorage
 from relatorios.functions import utils
+from relatorios.functions.corretor_simulinho import cria_simulados
 
 
 def index(request):
@@ -12,26 +13,39 @@ def index(request):
     utils.alertas.clear()
 
     if request.method == 'POST':
-        arquivo_recebido = utils.converte_arquivo(request.FILES['planilha']) \
-            if 'planilha' in request.FILES else False
+        arquivos_permitidos = ['acertos_aluno.pkl', 'colocacao.pkl', 'comentarios.pkl', 'dados_redacao.pkl', 'data.pkl', 'notas.pkl']
+        arquivos_recebidos = request.FILES.getlist('dados_simulinho')
 
-        if arquivo_recebido:
-            utils.escreve_arquivo(arquivo_recebido)
+        if sorted([arquivo.name for arquivo in arquivos_recebidos]) == sorted(arquivos_permitidos):
+            for arquivo in arquivos_recebidos:
+                NovoStorage().save(arquivo.name, arquivo)
             utils.memo.clear()
+            utils.cria_json()
+            # if 'dados_simulinho' in request.FILES else False
+            #     arquivo_armazenado = NovoStorage()
+            #     arquivo_armazenado.save(arquivo_recebido.name, arquivo_recebido)
+            #     if arquivo_recebido:
+            #         utils.escreve_arquivo(arquivo_recebido)
+            #         utils.memo.clear()
 
         return HttpResponseRedirect(reverse('index'))
 
-        # arquivo_armazenado = NovoStorage()
-        # nome_arquivo = arquivo_armazenado.save('dados.json', arquivo_recebido)
-        # arquivo_json = trata_arquivo(nome_arquivo)
-        # dados['url'] = arquivo_armazenado.url(nome_arquivo)
     dados['relatorios'] = utils.le_arquivo()[0]['relatorios']
     if utils.alertas:
         dados['alertas'] = utils.alertas
-
+    # dados.setdefault("url", []).append(NovoStorage().url(nome_arquivo))
     return render(request, 'index.html', dados)
 
+def status_relatorios_ajax(request):
+    novos_status = utils.novo_status.copy()
+    utils.novo_status.clear()
+    return JsonResponse({'novos_status': novos_status})
+    # return render(request, 'index.html', utils.le_arquivo()[0])
 
+
+def envia_relatorios(request):
+    cria_simulados()
+    return HttpResponseRedirect(reverse('index'))
 
 
 # # PDF

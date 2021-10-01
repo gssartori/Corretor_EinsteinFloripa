@@ -7,11 +7,13 @@
     <title>Corretor de Relatórios</title>
     <link rel="stylesheet" href="{% static '_css/style.css' %}">
     <link rel="stylesheet" href="{% static '_css/alerts.css' %}">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="{% static '_js/django-ajax-status.js' %}"></script>
 </head>
 
-{% include 'partials/menu.html' %}
 
 <body>
+    <img class="logo" src="{% static '_img/logo.png'%}">
     {% block base_content %} {% endblock %}
 </body>
 </html>

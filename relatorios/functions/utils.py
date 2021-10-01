@@ -1,120 +1,100 @@
+# O arquivo utils.py contém os métodos e funções necessárias para o gerenciamento
+# direto dos arquivos utilizados
+
 from django.core.files.storage import default_storage
 import pandas as pd
 import json, datetime
 
-alertas = []    # lista de dicionários
-memo = {}       # memorizador do dados.json {'nome_aluno': index}
 
-def proximo_status(status_atual, erro = False):
-    """
-      Função retorna o próximo status do aluno, de acordo com seu status atual,
-      seguindo a seguinte ordem:
-        *None --> Pendente --> Gerando --> Enviando --> Enviado || Não Enviado (se erro=True)
+alertas = []        # lista de dicionários
+memo = {}           # memorizador do status_envio.json {'nome_aluno': index}
+novo_status = []    # lista de dict's temporária que armazenam o nome e o novo status do aluno
 
-      Obs: Caso não esteja em algum desses 3 estados, ocorreu algum erro
-    """
-    if not status_atual:
-        return 'Pendente'
-    elif (status_atual == 'Pendente'):
-        return 'Gerando'
-    elif (status_atual == 'Gerando'):
-        return 'Enviando'
-    elif (any(status_atual == 'Enviando', status_atual == 'Não Enviado')):
-        return 'Enviado' if not erro else 'Não Enviado'
-    else:
-        alertas.append({"titulo": "Error", "mensagem": "Status não reconhecido proximo_status()"})
-        return 'None'
+def escreve_arquivo(relatorios):
+    """ Função responsável por escrever algo no arquivo status_envio.json """
+    try:
+        with default_storage.open('status_envio.json', mode='w') as arquivo_json:
+            json.dump([{"relatorios": json.loads(relatorios)}], arquivo_json, ensure_ascii=False)
+
+    except Exception as e:
+        alertas.append({"titulo": "Arquivo Não Identificado", "mensagem": e})  # dispara_alerta("Arquivo Corrompido", e)
 
 
-def edita_status(nome_aluno, erro=False):
+def le_arquivo():
+    """ Função responsável por ler o arquivo status_envio.json """
+    try:
+        with default_storage.open('status_envio.json', mode='r') as arquivo_json:
+            return json.loads(arquivo_json.read())
+            # for data in dados[0]['relatorios']: data['Data'] = datetime.datetime.fromtimestamp(data['Data'] / 1e3)
+    except Exception as e:
+        print('SE LIGA NO ERRO::::: ', e)
+        alertas.append({"titulo": "Arquivo não lido", "mensagem": e})  # dispara_alerta("Arquivo Corrompido", e)
+        return json.loads('[{"relatorios": []}]')
+
+
+def edita_status(nome_aluno, proximo_status, envio_confirmado=True):
     """
       Método responsável por buscar e alterar o estado do relatório do aluno pelo seu nome;
       A busca realizada é do tipo binária, e é delimitada aos alunos cujos estados são
       diferentes de 'Enviado' / 'Enviando'
 
-      Obs: o arquivo.json é ordenado pelo 'Status' e 'Nome' do aluno, respectivamente.
+      Obs: o status_envio.json é ordenado pelo 'Status' e 'Nome' do aluno, respectivamente.
     """
     dados_aluno = le_arquivo()[0]['relatorios']
-
-    inicio = 0
-    fim = len(dados_aluno) - 1
+    if not envio_confirmado:
+        proximo_status = 'Não Enviado'
+        alertas.append({"titulo": "Error", "mensagem": "Email não enviado"})
     encontrou = False
 
     if nome_aluno in memo:
         index = memo[nome_aluno]
-        dados_aluno[index]['Status'] = proximo_status(dados_aluno[index]["Status"])
+        dados_aluno[index]['Status'] = proximo_status
+        encontrou = True
 
     else:
-        # Busca binária
-        while (inicio <= fim and not encontrou):
-            meio = (inicio + fim) // 2
-            if dados_aluno[meio]['Nome'].lower() == nome_aluno.lower():
-                dados_aluno[meio]['Status'] = proximo_status(dados_aluno[meio]["Status"])
-                memo[nome_aluno] = meio
+        for i, aluno in enumerate(dados_aluno):
+            if (aluno['Nome'].lower() == nome_aluno.lower()):
+                aluno["Status"] = proximo_status
                 encontrou = True
-            else:
-                if nome_aluno.lower() < dados_aluno['Nome'][meio].lower():
-                    fim = meio - 1
-                else:
-                    inicio = meio + 1
-
-        if not encontrou:
-            # Busca linear, caso a busca binária não encontre
-            for i, aluno in enumerate(dados_aluno):
-                if (aluno['Nome'].lower() == nome_aluno.lower()):
-                    aluno["Status"] = proximo_status(aluno["Status"])
-                    print('!!!!Busca Linear@@@@@')
-                    encontrou = True
-                    memo[nome_aluno] = i
-                    break
-
+                memo[nome_aluno] = i
+                break
     if not encontrou:
-        aluno["Status"] = "ERROR <-- Aluno não encontrado no JSON -->"
+        alertas.append({"titulo": "ERRO", "mensagem": "<-- Aluno não encontrado no JSON -->"})
     else:
-        dados_editados = json.dumps([{'relatorios': dados_aluno}])
+        dados_editados = json.dumps(dados_aluno)
         escreve_arquivo(dados_editados)
+        print(f'Status de "{dados_aluno[memo[nome_aluno]]["Status"]}" alterado')
+        # adicionando o status atualizado para leitura do status_relatorios_ajax
+        novo_status.append({nome_aluno: dados_aluno[memo[nome_aluno]]['Status']})
 
 
-def converte_arquivo(arquivo):
+
+def procura_email(nome_aluno):
     """
-    Função verifica o tipo do :arquivo: recebido e converte os dados
-    no formato .json
+    Essa função deve buscar o email do aluno de acordo com o nome_aluno.
+
+    Uma possibilidade é upar um arquivo junto com os arquivos selecionados
+    contendo o nome e o email do aluno. A busca pode ser feita com qualquer lib,
+    e para acessar o diretório das medias basta verificar na função 'le_arquivo()'
     """
-    tipo_arquivo = arquivo.name.split(".")[-1]
-
-    if tipo_arquivo in ('xls', 'xlsx', 'xlsm', 'xlsb', 'odf', 'ods', 'odt'): arquivo = pd.read_excel(arquivo)
-    elif tipo_arquivo == 'json': arquivo = pd.read_json(arquivo)
-    elif tipo_arquivo == 'csv': arquivo = pd.read_csv(arquivo)
-    else:
-        alertas.append({"titulo": "Tipo de arquivo inválido",
-                        "mensagem": "ERROR!!! Coloque um arquivo com tipo válido: \n "
-                                    "'xls', 'xlsx', 'xlsm', 'xlsb', 'odf', 'ods', 'odt', 'json', 'csv'"})
-        return None
-
-    return arquivo.sort_values(by=['Nome'], ascending=True).to_json(orient='records', force_ascii=False)
+    return 'gabriel.s@autojun.com.br'
 
 
-def escreve_arquivo(relatorios):
-    """ Função responsável por escrever algo no arquivo dados.json """
-    try:
-        with default_storage.open('dados.json', mode='w') as arquivo_json:
-            json.dump([{"relatorios": json.loads(relatorios)}], arquivo_json, ensure_ascii=False)
+def cria_json():
+    """
+    Esse método é chamado apenas quando os dados .pkl são salvos, recebendo
+    :return:
+    """
+    df_q = pd.read_pickle(default_storage.open('data.pkl'))
+    dados_alunos = []
+    for index, nome_aluno in enumerate(df_q.index.get_level_values(0).unique()):
+        dados_alunos.append({'Nome': nome_aluno,
+                             'Status': 'Pendente',
+                             'Data': datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                             'email': procura_email(nome_aluno)})
+        memo[nome_aluno]: index
 
-    except Exception as e:
-        alertas.append({"titulo": "Arquivo Corrompido", "mensagem":e}) # dispara_alerta("Arquivo Corrompido", e)
-
-def le_arquivo():
-    try:
-        with default_storage.open('dados.json', mode='r') as arquivo_json:
-            dados = json.loads(arquivo_json.read())
-            for data in dados[0]['relatorios']:
-                data['Data'] = datetime.datetime.fromtimestamp(data['Data'] / 1e3)
-            return dados
-
-    except Exception as e:
-        if str(e) == 'Expecting value: line 1 column 1 (char 0)':
-            alertas.append({"titulo": "Alerta de Teste", "mensagem": e})
-            return json.loads('[{"relatorios": []}]')
+    escreve_arquivo(json.dumps(dados_alunos))
 
 
 

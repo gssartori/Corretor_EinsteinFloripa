@@ -1,7 +1,7 @@
 <!--
 
-    basicamente, cada tabela que vai ser printada é um DataFrame que já veio formatado
-    (cores e dados tudo certinho). aí é só printar os gráficos e as tabelas na ordem
+    basicamente, cada tabela que vai ser printada Ã© um DataFrame que jÃ¡ veio formatado
+    (cores e dados tudo certinho). aÃ­ Ã© sÃ³ printar os grÃ¡ficos e as tabelas na ordem
 
 -->
 
@@ -9,7 +9,7 @@
 <html lang="pt-br">
     <head>
       <page size="A4"></page>
-      <meta charset="windows-1252" />
+      <meta charset="UTF-8" /> <!-- charset=windows-1252" -->
       <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
       <style>
 
@@ -125,10 +125,10 @@
     <br>
 
     <p class='intro_text'>
-        Olá, {{ nome.split(' ')[0].title()}}! <br>
+        OlÃ¡, {{ nome }}! <br> <!-- nome.split(' ')[0].title() -->
         <br>
-        Esta é a correção do seu Simulinho. Aqui você confere sua porcentagem de acerto em cada matéria e seu desempenho em relação aos outros colegas do Einstein, além da correção de cada questão. <br>
-        <br> Você ficou em {{colocacao | safe}}º lugar!
+        Esta Ã© a correÃ§Ã£o do seu Simulinho. Aqui vocÃª confere sua porcentagem de acerto em cada matÃ©ria e seu desempenho em relaÃ§Ã£o aos outros colegas do Einstein, alÃ©m da correÃ§Ã£o de cada questÃ£o. <br>
+        <br> VocÃª ficou em {{colocacao | safe}}Âº lugar!
         <br>
         Bons estudos!
         <br>
@@ -144,12 +144,12 @@
     <hr class='section'>
 
 
-    <center><h2 class='title'>Redação</h2></center>
+    <center><h2 class='title'>RedaÃ§Ã£o</h2></center>
     <center>{{redacao | safe}}</center>
     <center>{{comentario | safe}} </center>
     <br><br><br>
     <!--<center>
-    <figure> É GRPAFICO, SIMULINHO NÃO TEM
+    <figure> Ã‰ GRPAFICO, SIMULINHO NÃƒO TEM
         <img src= "{{grafico_path | safe}}"/>
     </figure>
 
@@ -159,7 +159,7 @@
     <hr class='section'>
 
     {% for m in materias %}
-    <center><h2 class='title'>Questões de {{m.materia}}</h2></center>
+    <center><h2 class='title'>QuestÃµes de {{m.materia}}</h2></center>
     <center>{{m.df | safe}}</center>
     <br><br><br>
     {% endfor %}
