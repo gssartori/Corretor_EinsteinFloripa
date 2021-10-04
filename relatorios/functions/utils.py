@@ -10,6 +10,26 @@ alertas = []        # lista de dicionários
 memo = {}           # memorizador do status_envio.json {'nome_aluno': index}
 novo_status = []    # lista de dict's temporária que armazenam o nome e o novo status do aluno
 
+
+def valida_nome_uploads(nomes_arquivos_recebidos):
+    """
+    Função verifica se os arquivos recebidos estão nomeados corretamente para os envios dos emails
+
+    :return:
+    True se os nomes dos arquivos recebidos estão corretos,
+    False caso contrário, adicionando uma mensagem de alerta ao usuário
+    """
+    arquivos_permitidos = ['acertos_aluno.pkl', 'colocacao.pkl', 'comentarios.pkl',
+                           'dados_redacao.pkl', 'data.pkl', 'notas.pkl']
+    if nomes_arquivos_recebidos == sorted(arquivos_permitidos):
+        return True
+    alertas.append({"titulo": "Atenção!!!",
+                        "mensagem": f"Os {len(arquivos_permitidos)} uploads devem ter os seguintes nomes: "
+                                    f"{', '.join(arquivos_permitidos)}"})
+    return False
+
+
+
 def escreve_arquivo(relatorios):
     """ Função responsável por escrever algo no arquivo status_envio.json """
     try:
@@ -83,7 +103,6 @@ def procura_email(nome_aluno):
 def cria_json():
     """
     Esse método é chamado apenas quando os dados .pkl são salvos, recebendo
-    :return:
     """
     df_q = pd.read_pickle(default_storage.open('data.pkl'))
     dados_alunos = []

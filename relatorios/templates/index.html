@@ -7,9 +7,7 @@
     <h1>Relatórios</h1>
 
 
-    {% if alertas %}
-        {% include 'partials/alerta.html' %}
-    {% endif %}
+
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -23,10 +21,6 @@
             <button class="button" onclick="">Gerar e Enviar Relatórios</button>
         </form>
 
-        {% if url %}
-            <p> Ver informações do Eduqo:   <a href="{{ url }}">{{url}}</a>     </p>
-        {% endif %}
-
         <div class="tablesubcontainer">
             <table>
                 <thead>
@@ -34,7 +28,7 @@
                     <td>Email</td>
                     <td>Status</td>
                     <td>Data</td>
-                    <!--<td>Downloads</td>-->
+                    <td>Downloads</td>
                 </thead>
 
                 <tbody>
@@ -47,6 +41,12 @@
                             {{ relatorio.Status }}
                         </td>
                         <td>{{ relatorio.Data }}</td>
+                        <td>
+                            <form action="/exporta_pdf" method="get">
+                                <input type="text" value="{{ relatorio.Nome }}" name="download_pdf" id="download_pdf"/>
+                                <input type="submit" class="btn" value="Download PDF" name="btn_download_pdf">
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                 {% else %}
@@ -58,6 +58,9 @@
         </div>
     </div>
     <div class="foot"></div>
+    {% if alertas %}
+        {% include 'partials/alerta.html' %}
+    {% endif %}
 {% block js %}
 
 {% endblock js %}

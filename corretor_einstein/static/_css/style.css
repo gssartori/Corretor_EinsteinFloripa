@@ -93,6 +93,9 @@ th {
 #upload-arquivos-pickle{
   display: none;
 }
+#download_pdf{
+  display: none;
+}
 
 /* Aparência que terá o seletor de arquivo */
 .upload-arquivos{

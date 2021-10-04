@@ -1,53 +1,58 @@
-from django.shortcuts import render
-from .models import Relatorio, NovoStorage
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
+from django.shortcuts import render
 from django.urls import reverse
-from django.core.files.storage import FileSystemStorage
+from .models import NovoStorage
 from relatorios.functions import utils
 from relatorios.functions.corretor_simulinho import cria_simulados
 
 
 def index(request):
-    # relatorios = Relatorio.objects.all()
-    dados = dict() # {'relatorios': relatorios}
-    utils.alertas.clear()
+    dados = dict()
 
     if request.method == 'POST':
-        arquivos_permitidos = ['acertos_aluno.pkl', 'colocacao.pkl', 'comentarios.pkl', 'dados_redacao.pkl', 'data.pkl', 'notas.pkl']
         arquivos_recebidos = request.FILES.getlist('dados_simulinho')
 
-        if sorted([arquivo.name for arquivo in arquivos_recebidos]) == sorted(arquivos_permitidos):
+        if utils.valida_nome_uploads(sorted([arquivo.name for arquivo in arquivos_recebidos])):
             for arquivo in arquivos_recebidos:
                 NovoStorage().save(arquivo.name, arquivo)
             utils.memo.clear()
             utils.cria_json()
-            # if 'dados_simulinho' in request.FILES else False
-            #     arquivo_armazenado = NovoStorage()
-            #     arquivo_armazenado.save(arquivo_recebido.name, arquivo_recebido)
-            #     if arquivo_recebido:
-            #         utils.escreve_arquivo(arquivo_recebido)
-            #         utils.memo.clear()
 
         return HttpResponseRedirect(reverse('index'))
 
     dados['relatorios'] = utils.le_arquivo()[0]['relatorios']
     if utils.alertas:
-        dados['alertas'] = utils.alertas
-    # dados.setdefault("url", []).append(NovoStorage().url(nome_arquivo))
+        dados['alertas'], utils.alertas = utils.alertas[:], []
+
     return render(request, 'index.html', dados)
 
-def status_relatorios_ajax(request):
-    novos_status = utils.novo_status.copy()
-    utils.novo_status.clear()
-    return JsonResponse({'novos_status': novos_status})
-    # return render(request, 'index.html', utils.le_arquivo()[0])
+def atualiza_pagina_ajax(request):
+    dados = dict()
+    dados['novos_status'], utils.novo_status = utils.novo_status[:], []
+    if utils.alertas:
+        dados['alertas'], utils.alertas = utils.alertas[:], []
+    return JsonResponse(dados)
 
 
 def envia_relatorios(request):
     cria_simulados()
     return HttpResponseRedirect(reverse('index'))
 
+def exporta_pdf(request):
+    if (request.GET.get('btn_download_pdf')):
+        nome_aluno = request.GET.get('download_pdf')
+        pdf = cria_simulados(nome_aluno)
 
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            nome_arquivo = "%s.pdf" %(nome_aluno)
+            content = "inline; filename='%s'" % (nome_arquivo)
+            download = request.GET.get("download")
+            if download:
+                content = "attachment; filename='%s'" % (nome_arquivo)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("PDF não encontrado")
 # # PDF
 # from django.template.loader import render_to_string
 # # from weasyprint import HTML
