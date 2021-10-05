@@ -26,6 +26,7 @@ def index(request):
 
     return render(request, 'index.html', dados)
 
+
 def atualiza_pagina_ajax(request):
     dados = dict()
     dados['novos_status'], utils.novo_status = utils.novo_status[:], []
@@ -35,13 +36,24 @@ def atualiza_pagina_ajax(request):
 
 
 def envia_relatorios(request):
-    cria_simulados()
+    if request.GET.get('btn_envia_email'):
+        cria_simulados(nome_aluno=request.GET.get('envia_email'), enviar_email=True)
+
+    elif request.GET.get('btn_envia_emails'):
+        cria_simulados(enviar_email=True)
+
     return HttpResponseRedirect(reverse('index'))
+
+
+def limpa_media(request):
+    utils.limpa_dados()
+    return HttpResponseRedirect(reverse('index'))
+
 
 def exporta_pdf(request):
     if (request.GET.get('btn_download_pdf')):
         nome_aluno = request.GET.get('download_pdf')
-        pdf = cria_simulados(nome_aluno)
+        pdf = cria_simulados(nome_aluno, enviar_email=False)
 
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')

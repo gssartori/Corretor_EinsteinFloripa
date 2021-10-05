@@ -77,12 +77,12 @@ WSGI_APPLICATION = 'corretor_einstein.wsgi.application'
 
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'db_relatorios_einstein',
-#         'USER': 'root',
-#         'PASSWORD': '',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
+#         'ENGINE':     '',
+#         'NAME':       '',
+#         'USER':       '',
+#         'PASSWORD':   '',
+#         'HOST':       '',
+#         'PORT':       '',
 #     }
 # }
 

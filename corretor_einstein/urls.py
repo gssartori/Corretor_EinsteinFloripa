@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', include('relatorios.urls')),     # quando não tem nada escrito no 1° parâmetro, vai pro localhost
+    path('', include('relatorios.urls')),
     path('admin/', admin.site.urls),
 ]
 

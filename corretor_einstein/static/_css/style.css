@@ -90,12 +90,10 @@ th {
 
 /*Seleção de arquivos*/
 /**/
-#upload-arquivos-pickle{
+.hidden-input{
   display: none;
 }
-#download_pdf{
-  display: none;
-}
+
 
 /* Aparência que terá o seletor de arquivo */
 .upload-arquivos{
@@ -116,6 +114,7 @@ th {
 }
 
 
+/*
 input[type=text] {
   width: 300px;
   padding: 12px 20px;
@@ -130,4 +129,4 @@ input[type=text] {
 
 input[type=text]:focus {
   border: 3px solid #555;
-}
+}*/

@@ -11,4 +11,4 @@ setInterval(function() {
             });
         },
         error : function(xhr) { console.log('Erro') }
-    })}, 5000)
+    })}, 7000)

@@ -1,24 +1,22 @@
 {% extends 'base.html' %}           <!--estender tudo do base.html-->
 {% load static %}                   <!--Caso existam arquivos estáticos na página-->
 
-{% block base_content %}                 <!-- bloco base.html começa aqui -->
+{% block base_content %}            <!-- bloco base.html começa aqui -->
 
 
     <h1>Relatórios</h1>
 
 
-
-
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <label for="upload-arquivos-pickle" class="upload-arquivos">Selecionar Arquivos</label>
- 		<input type="file" name="dados_simulinho" id="upload-arquivos-pickle" multiple>
+ 		<input type="file" name="dados_simulinho" id="upload-arquivos-pickle" class="hidden-input" multiple>
         <button type="submit" class="upload-submit">Fazer Upload</button>
     </form>
 
     <div class="container">
         <form action="/envia_relatorios">
-            <button class="button" onclick="">Gerar e Enviar Relatórios</button>
+            <input type="submit" class="btn button" value="Gerar e Enviar Relatórios" name="btn_envia_emails">
         </form>
 
         <div class="tablesubcontainer">
@@ -28,7 +26,8 @@
                     <td>Email</td>
                     <td>Status</td>
                     <td>Data</td>
-                    <td>Downloads</td>
+                    <td>Download</td>
+                    <td></td>
                 </thead>
 
                 <tbody>
@@ -43,8 +42,14 @@
                         <td>{{ relatorio.Data }}</td>
                         <td>
                             <form action="/exporta_pdf" method="get">
-                                <input type="text" value="{{ relatorio.Nome }}" name="download_pdf" id="download_pdf"/>
+                                <input type="text" value="{{ relatorio.Nome }}" name="download_pdf" id="download_pdf" class="hidden-input"/>
                                 <input type="submit" class="btn" value="Download PDF" name="btn_download_pdf">
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/envia_relatorios">
+                                <input type="text" value="{{ relatorio.Nome }}" name="envia_email" id="envia_email" class="hidden-input"/>
+                                <input type="submit" class="btn button" value="Enviar Email" name="btn_envia_email">
                             </form>
                         </td>
                     </tr>
@@ -52,10 +57,13 @@
                 {% else %}
                 {% endif %}
                 </tbody>
-
             </table>
 
         </div>
+
+        <form action="/limpa_media">
+            <input type="submit" class="btn button" value="Apagar Tudo" name="btn_apaga_dados">
+        </form>
     </div>
     <div class="foot"></div>
     {% if alertas %}
