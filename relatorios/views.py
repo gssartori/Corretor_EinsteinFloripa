@@ -65,29 +65,4 @@ def exporta_pdf(request):
             response['Content-Disposition'] = content
             return response
         return HttpResponse("PDF não encontrado")
-# # PDF
-# from django.template.loader import render_to_string
-# # from weasyprint import HTML
-# import tempfile
-# from django.db.models import Sum
-#
-# def exporta_pdf():
-#     pass
-#     response = HttpResponse(content_type='application/pdf')
-#     response['Content-Disposition'] = 'attachment; filename='+str("NOME_ALUNO")+'.pdf'
-#     response['Content-Transfer-Encoding'] = 'binary'
-#
-#     dados = {}
-#     html_string = render_to_string('templates/simulinho_aluno_template.html', dados)
-#     html = HTML(string=html_string)
-#
-#     result = html.write_pdf()
-#
-#     with tempfile.NamedTemporaryFile(delete=True) as simulinho:
-#         simulinho.write(result)
-#         simulinho.flush()
-#
-#         output = open(simulinho.name, 'rb')
-#         response.write(output.read())
-#
-#     return response
+
