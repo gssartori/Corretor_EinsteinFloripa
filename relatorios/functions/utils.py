@@ -46,7 +46,7 @@ def le_arquivo():
     try:
         with default_storage.open('status_envio.json', mode='r') as arquivo_json:
             return json.loads(arquivo_json.read())
-            # for data in dados[0]['relatorios']: data['Data'] = datetime.datetime.fromtimestamp(data['Data'] / 1e3)
+
     except Exception as e:
         alertas.append({"titulo": "Arquivo não pode ser lido", "mensagem": e})
         return json.loads('[{"relatorios": []}]')
@@ -86,12 +86,15 @@ def procura_email(nome_aluno):
     Uma possibilidade é upar um arquivo junto com os arquivos selecionados
     contendo o nome e o email do aluno. A busca pode ser feita com qualquer lib,
     e para acessar o diretório das medias basta verificar na função 'le_arquivo()'
+
+    Obs: A variável 'arquivos_permitidos' deve ser alterada na ocorrência de
+    qualquer mudança na quantidade e nome dos arquivos enviados ao servidor.
     """
     return 'gabriel.s@autojun.com.br'
 
 
 def cria_json():
-    """ Esse método é chamado apenas quando os arquivos .pkl são salvos. """
+    """ Esse método é chamado apenas quando os arquivos .pkl são upados e salvos. """
     df_q = pd.read_pickle(default_storage.open('data.pkl'))
     dados_alunos = []
 
@@ -106,6 +109,7 @@ def cria_json():
 
 
 def limpa_dados():
+    """ Método limpa todas as informações dos alunos no servidor. """
     # limpando os arquivos .pkl
     for arquivo in arquivos_permitidos:
         try:
@@ -113,6 +117,7 @@ def limpa_dados():
                 with default_storage.open(arquivo, mode='w') as file:
                     dump([], file)
             # Caso existam outros arquivos de outros tipos, colocar aqui...
+
         except Exception as e:
             alertas.append({"titulo": f"Arquivo {arquivo} Não Encontrado", "mensagem": e})
 

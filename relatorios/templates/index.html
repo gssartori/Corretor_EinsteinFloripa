@@ -3,68 +3,72 @@
 
 {% block base_content %}            <!-- bloco base.html começa aqui -->
 
-
-    <h1>Relatórios</h1>
-
-
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label for="upload-arquivos-pickle" class="upload-arquivos">Selecionar Arquivos</label>
- 		<input type="file" name="dados_simulinho" id="upload-arquivos-pickle" class="hidden-input" multiple>
-        <button type="submit" class="upload-submit">Fazer Upload</button>
-    </form>
-
     <div class="container">
+        <h1>RELATÓRIOS</h1>
+
+        <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+            <label for="upload-arquivos-pickle" class="btn btnmenu">Selecionar Arquivos</label>
+            <input type="file" name="dados_simulinho" id="upload-arquivos-pickle" class="hidden-input" multiple>
+            <button type="submit" class="btn btnmenu">Fazer Upload</button>
+        </form>
+
         <form action="/envia_relatorios">
-            <input type="submit" class="btn button" value="Gerar e Enviar Relatórios" name="btn_envia_emails">
+            <input type="submit" class="btn btnmenu" value="Gerar e Enviar Relatórios" name="btn_envia_emails">
         </form>
 
-        <div class="tablesubcontainer">
-            <table>
-                <thead>
-                    <td>Nome</td>
-                    <td>Email</td>
-                    <td>Status</td>
-                    <td>Data</td>
-                    <td>Download</td>
-                    <td></td>
-                </thead>
-
-                <tbody>
-                {% if relatorios %}
-                {% for relatorio in relatorios %}
-                    <tr class="{{ relatorio.Status }}">
-                        <td>{{ relatorio.Nome }}</td>
-                        <td>{{ relatorio.Email }}</td>
-                        <td id="{{ relatorio.Nome }}">
-                            {{ relatorio.Status }}
-                        </td>
-                        <td>{{ relatorio.Data }}</td>
-                        <td>
-                            <form action="/exporta_pdf" method="get">
-                                <input type="text" value="{{ relatorio.Nome }}" name="download_pdf" id="download_pdf" class="hidden-input"/>
-                                <input type="submit" class="btn" value="Download PDF" name="btn_download_pdf">
-                            </form>
-                        </td>
-                        <td>
-                            <form action="/envia_relatorios">
-                                <input type="text" value="{{ relatorio.Nome }}" name="envia_email" id="envia_email" class="hidden-input"/>
-                                <input type="submit" class="btn button" value="Enviar Email" name="btn_envia_email">
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                {% else %}
-                {% endif %}
-                </tbody>
-            </table>
-
-        </div>
-
-        <form action="/limpa_media">
-            <input type="submit" class="btn button" value="Apagar Tudo" name="btn_apaga_dados">
+         <form action="/limpa_media">
+            <input type="submit" class="btn btnmenu" value="Apagar Tudo" name="btn_apaga_dados">
         </form>
+
+
+
     </div>
+
+
+
+
+    <div class="tablesubcontainer">
+        <table class='center'>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Download</th>
+                <th>Envio</th>
+
+            {% if relatorios %}
+            {% for relatorio in relatorios %}
+                <tr class="{{ relatorio.Status }}">
+                    <td>{{ relatorio.Nome }}</td>
+                    <td>{{ relatorio.Email }}</td>
+                    <td id="{{ relatorio.Nome }}">
+                        {{ relatorio.Status }}
+                    </td>
+                    <td>{{ relatorio.Data }}</td>
+                    <td>
+                        <form action="/exporta_pdf" method="get">
+                            <input type="text" value="{{ relatorio.Nome }}" name="download_pdf" id="download_pdf" class="hidden-input"/>
+                            <input type="submit" class="btn button" value="Download PDF" name="btn_download_pdf">
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/envia_relatorios">
+                            <input type="text" value="{{ relatorio.Nome }}" name="envia_email" id="envia_email" class="hidden-input"/>
+                            <input type="submit" class="btn button" value="Enviar Email" name="btn_envia_email">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+            {% endif %}
+
+        </table>
+
+    </div>
+
+
+
     <div class="foot"></div>
     {% if alertas %}
         {% include 'partials/alerta.html' %}
@@ -74,4 +78,3 @@
 {% endblock js %}
 
 {% endblock %}              <!-- bloco base.html termina aqui -->
-

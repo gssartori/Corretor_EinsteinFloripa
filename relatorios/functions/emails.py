@@ -9,14 +9,25 @@ from relatorios.functions.utils import edita_status, alertas
 _email_origem = 'teste.einstein1@gmail.com'
 _password = 'Molotov123'
 
-# Configurando a sessão de login pelo protocolo SMTP
-session = SMTP('smtp.gmail.com', 587)
-session.starttls()
-session.login(_email_origem, _password)
+try:
+    # Configurando a sessão de login pelo protocolo SMTP
+    session = SMTP('smtp.gmail.com', 587)
+    session.starttls()
+    session.login(_email_origem, _password)
+except Exception as e:
+    print(f"PDF não enviado. Erro: \n {e}")
+    alertas.append({"titulo": f"PDF não enviado",
+                    "mensagem": "Certifique-se que a opção de 'Acesso a app menos seguro' "
+                                "está ativada para sua conta.\n Para saber mais:"
+                                "\n https://support.google.com/accounts/answer/6010255"
+                                "\n\n Caso esteja ativada, talvez a sessão esteja sendo "
+                                "bloqueada por algum outro protocolo de segurança no acesso. "
+                                "Verifique a aba de segurança da sua conta"})
 
 def logout_email():
     # Após o último relatório a ser enviado, é preciso encerrar a sessão do email
-    session.quit()
+    try: session.quit()
+    except: pass
 
 
 def envia_email(texto, email_destino):

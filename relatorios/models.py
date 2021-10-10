@@ -2,7 +2,9 @@ from django.db import models
 from datetime import datetime
 from django.core.files.storage import FileSystemStorage
 
-# Create your models here.
+# User-admin:
+    ## Usuário => EinsteinFloripa
+    ## Senha   => einstein_autojun
 
 class Relatorio(models.Model):
     # nome_aluno = models.CharField(max_length=255, primary_key=True, blank=False)
@@ -16,8 +18,8 @@ class Relatorio(models.Model):
 class NovoStorage(FileSystemStorage):
     def get_available_name(self, name, max_length):
         """
-        Retorna um filename disponível para a class storage e
-        o novo conteúdo para ser gravado
+            Retorna um filename disponível para a class storage e
+            o novo conteúdo para ser gravado.
         """
         # Se o filename já existir, este é removido
         if self.exists(name):
