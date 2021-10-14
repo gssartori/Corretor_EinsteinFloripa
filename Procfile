@@ -1,0 +1,1 @@
+web: gunicorn corretor_einstein.wsgi
