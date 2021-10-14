@@ -2,8 +2,8 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from .models import NovoStorage
-from relatorios.functions import utils
-from relatorios.functions.corretor_simulinho import cria_simulados
+from Corretor_EinsteinFloripa.relatorios.functions import utils
+from Corretor_EinsteinFloripa.relatorios.functions.corretor_simulinho import cria_simulados
 
 
 def index(request):

@@ -3,8 +3,8 @@ from io import BytesIO
 from xhtml2pdf import pisa
 from django.template.loader import get_template
 from django.core.files.storage import default_storage
-from relatorios.functions.utils import edita_status, procura_email, alertas
-from relatorios.functions.emails import constroi_email, logout_email
+from Corretor_EinsteinFloripa.relatorios.functions.utils import edita_status, procura_email, alertas
+from Corretor_EinsteinFloripa.relatorios.functions.emails import constroi_email, logout_email
 # from jinja2 import Environment, FileSystemLoader
 # from flask import url_for
 # import numpy as np
