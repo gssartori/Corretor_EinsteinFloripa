@@ -8,6 +8,7 @@ from Corretor_EinsteinFloripa.relatorios.functions.utils import edita_status, al
 _email_origem = 'teste.einstein1@gmail.com'
 _password = 'Molotov123'
 
+
 # Configurando a sessão de login pelo protocolo SMTP
 session = SMTP('smtp.gmail.com', 587)
 def login_email():
