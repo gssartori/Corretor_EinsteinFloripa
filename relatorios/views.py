@@ -20,19 +20,16 @@ def index(request):
 
         return HttpResponseRedirect(reverse('index'))
 
-    dados['relatorios'] = utils.le_arquivo()[0]['relatorios']
-    if utils.alertas:
-        dados['alertas'], utils.alertas = utils.alertas[:], []
+    alertas = utils.le_arquivo('alertas')
+    if alertas: dados['alertas'] = alertas
+
+    dados['relatorios'] = utils.le_arquivo('relatorios')
 
     return render(request, 'index.html', dados)
 
 
 def atualiza_pagina_ajax(request):
-    dados = dict()
-    dados['novos_status'], utils.novo_status = utils.novo_status[:], []
-    if utils.alertas:
-        dados['alertas'], utils.alertas = utils.alertas[:], []
-    return JsonResponse(dados)
+    return JsonResponse(utils.verifica_dados())
 
 
 def envia_relatorios(request):

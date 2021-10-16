@@ -5,11 +5,15 @@
 
     <div id="alerta" class="overlay">
         <div class="popup">
-            <h2>{{ alerta.titulo }}</h2>
             <a class="close" href="#">&times;</a>
-            <div class="content">
-                {{ alerta.mensagem }}
-            </div>
+
+            {% if alertas %}
+                <h2>{{ alerta.titulo }}</h2>
+                <div class="content"> {{ alerta.mensagem }} </div>
+            {% endif %}
+
+            <h2 id="titulo-alerta"></h2>
+            <div class="content" id="mensagem-alerta"></div>
         </div>
     </div>
 

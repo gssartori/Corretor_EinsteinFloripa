@@ -3,7 +3,7 @@ from io import BytesIO
 from xhtml2pdf import pisa
 from django.template.loader import get_template
 from django.core.files.storage import default_storage
-from Corretor_EinsteinFloripa.relatorios.functions.utils import edita_status, procura_email, alertas
+from Corretor_EinsteinFloripa.relatorios.functions.utils import edita_status, procura_email, trata_alerta
 from Corretor_EinsteinFloripa.relatorios.functions.emails import constroi_email, logout_email
 # from jinja2 import Environment, FileSystemLoader
 # from flask import url_for
@@ -40,7 +40,7 @@ def cria_simulados(nome_aluno = None, enviar_email = True):
 
     :param nome_aluno:
         - Vazio por padrão, indicando que todos os PDFs serão criados e enviados por
-    email automaticamente através da lib 'emails'.
+    email automaticamente através da pasta 'emails'.
         - Se um nome for passado como parâmetro na chamada da função, será preenchido
     apenas o PDF do respectivo aluno
 
@@ -75,6 +75,7 @@ def cria_simulados(nome_aluno = None, enviar_email = True):
         # cria um dicionário com as variáveis pro template
         doc = {'document_title': 'Correção SIMULINHO 2021'}
 
+        emails_nao_enviados = 0
         # pra cada aluno
         for aluno in df_q.index.get_level_values(0).unique():
             if (nome_aluno == None or nome_aluno == aluno):
@@ -171,15 +172,19 @@ def cria_simulados(nome_aluno = None, enviar_email = True):
 
                 if not pdf.err:
                     if enviar_email:
-                        constroi_email(html_para_pdf.getvalue(), doc['nome'], procura_email(aluno))
+                        envio_confirmado = constroi_email(html_para_pdf.getvalue(), doc['nome'], procura_email(aluno))
 
+                        # Se 4 relatórios seguidos não forem enviados, o laço for se encerra
+                        if envio_confirmado: emails_nao_enviados = 0
+                        elif emails_nao_enviados >= 4: break
+                        else: emails_nao_enviados += 1
                     else:
                         edita_status(aluno, 'Gerado')
                         return html_para_pdf.getvalue()
                 else:
-                    alertas.append({"titulo": f"PDF de {aluno} não foi criado corretamente", "mensagem": pdf.err})
+                    trata_alerta({"titulo": f"PDF de {aluno} não foi criado corretamente", "mensagem": pdf.err})
         logout_email()
 
     except:
-        alertas.append({"titulo": f"Arquivos não identificados ou corrompidos",
-                        "mensagem": "Faça upload novamente de todos os arquivos necessários."})
+        trata_alerta({"titulo": f"Arquivos não identificados ou corrompidos",
+                      "mensagem": "Faça upload novamente de todos os arquivos necessários."})
