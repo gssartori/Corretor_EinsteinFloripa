@@ -6,12 +6,37 @@ import pandas as pd
 import json, datetime
 from _pickle import dump
 
+arquivos_permitidos = ['acertos_aluno.pkl', 'colocacao.pkl', 'comentarios.pkl', 'dados_redacao.pkl', 'data.pkl', 'notas.pkl']
 
-alertas = []        # [{'titulo': "", 'mensagem': ""},]                 Lista de alertas que aparecem na página inicial
+# alerta = []        # [{'titulo': "", 'mensagem': ""},]                 Lista de alertas que aparecem na página inicial
 novo_status = []    # [{'nome_aluno': "", 'novo_status_aluno': ""},]    Lista de status que preenche a tabela da página inicial
 memo = {}           # {'nome_aluno': index}
 
-arquivos_permitidos = ['acertos_aluno.pkl', 'colocacao.pkl', 'comentarios.pkl', 'dados_redacao.pkl', 'data.pkl', 'notas.pkl']
+def trata_alerta(alerta):
+    """
+        Função verifica os alertas já existentes em 'alertas.json, adiciona o
+        novo alerta e os envia ao método 'escreve_arquivo()'
+    """
+    escreve_arquivo(alertas=json.dumps(le_arquivo('alertas')+[alerta]))
+
+
+def verifica_dados():
+    """
+        Verifica se ocorreram mudanças nos alertas ou nos status dos alunos.
+        Caso existam, as retorna para aparecer na tela inicial
+    """
+    dados = dict()
+    global novo_status
+    if novo_status:
+        dados['novos_status'], novo_status = novo_status[:], []
+
+    alertas = le_arquivo('alertas') #.setDefault('alertas', None)
+    if alertas:
+        dados['alertas'] = alertas.copy()
+        escreve_arquivo(alertas=json.dumps([]))
+
+    return dados
+
 
 def valida_nome_uploads(nomes_arquivos_recebidos):
     """
@@ -24,38 +49,41 @@ def valida_nome_uploads(nomes_arquivos_recebidos):
     if nomes_arquivos_recebidos == sorted(arquivos_permitidos):
         return True
 
-    alertas.append({"titulo": "Atenção!!!",
-                    "mensagem": f"Os {len(arquivos_permitidos)} uploads devem ter os seguintes nomes: "
+    trata_alerta({"titulo": "!!!Atenção!!!",
+                  "mensagem": f"Os {len(arquivos_permitidos)} uploads devem ter os seguintes nomes: "
                                 f"\n\n{', '.join(arquivos_permitidos)}"})
     return False
 
 
 
-def escreve_arquivo(relatorios):
-    """ Função edita o arquivo status_envio.json """
+def escreve_arquivo(relatorios=None, alertas=None):
+    """ Função edita um dos arquivos .json da aplicação """
     try:
-        with default_storage.open('status_envio.json', mode='w') as arquivo_json:
-            json.dump([{"relatorios": json.loads(relatorios)}], arquivo_json, ensure_ascii=False)
+        arquivo = ('relatorios',relatorios) if relatorios else ('alertas',alertas)
+        with default_storage.open(f'{arquivo[0]}.json', mode='w') as arquivo_json:
+            json.dump([{arquivo[0]: json.loads(arquivo[1])}], arquivo_json, ensure_ascii=False)
 
     except Exception as e:
-        alertas.append({"titulo": "Arquivo Não Identificado", "mensagem": e})
+        escreve_arquivo(alertas=json.dumps([{"titulo": "Arquivo Não Identificado", "mensagem": str(e)}]))
 
 
-def le_arquivo():
-    """ Função lê o arquivo status_envio.json """
+def le_arquivo(arquivo):
+    """ Função lê um dos arquivos .json """
     try:
-        with default_storage.open('status_envio.json', mode='r') as arquivo_json:
-            return json.loads(arquivo_json.read())
+        with default_storage.open(f'{arquivo}.json', mode='r') as arquivo_json:
+            dados = json.loads(arquivo_json.read())[0][arquivo]
+            if dados:
+                return dados
 
     except Exception as e:
-        alertas.append({"titulo": "Arquivo não pode ser lido", "mensagem": e})
-        return json.loads('[{"relatorios": []}]')
+        escreve_arquivo(alertas=json.dumps([{"titulo": f"Arquivo '{arquivo}' não pode ser lido", "mensagem": str(e)}]))
+    return json.loads('[]')
 
 
 def edita_status(nome_aluno, proximo_status):
     """ Método busca e altera o status do aluno pelo seu nome """
 
-    dados_aluno = le_arquivo()[0]['relatorios']
+    dados_aluno = le_arquivo('relatorios')
     status_alterado = False
 
     if nome_aluno in memo:
@@ -71,12 +99,11 @@ def edita_status(nome_aluno, proximo_status):
 
     if status_alterado:
         dados_editados = json.dumps(dados_aluno)
-        escreve_arquivo(dados_editados)
+        escreve_arquivo(relatorios=dados_editados)
         novo_status.append({nome_aluno: dados_aluno[memo[nome_aluno]]['Status']})
     else:
-        alertas.append({"titulo": f"Aluno {nome_aluno} não encontrado",
-                        "mensagem": "Verifique se os arquivos carregados estão corrompidos"})
-
+        trata_alerta({"titulo": f"Aluno {nome_aluno} não encontrado",
+                      "mensagem": "Verifique se os arquivos carregados estão corrompidos"})
 
 
 def procura_email(nome_aluno):
@@ -105,7 +132,7 @@ def cria_json():
                              'email': procura_email(nome_aluno)})
         memo[nome_aluno]: index
 
-    escreve_arquivo(json.dumps(dados_alunos))
+    escreve_arquivo(relatorios=json.dumps(dados_alunos))
 
 
 def limpa_dados():
@@ -114,13 +141,14 @@ def limpa_dados():
     for arquivo in arquivos_permitidos:
         try:
             if arquivo.split('.')[-1] == 'pkl':
-                with default_storage.open(arquivo, mode='w') as file:
-                    dump([], file)
+                with default_storage.open(f"{arquivo}", mode='w') as file:
+                    json.dump([], file)
             # Caso existam outros arquivos de outros tipos, colocar aqui...
 
         except Exception as e:
-            alertas.append({"titulo": f"Arquivo {arquivo} Não Encontrado", "mensagem": e})
+            trata_alerta({"titulo": f"Arquivo {arquivo} Não Encontrado", "mensagem": e})
 
-    # limpando status_envio.json
-    escreve_arquivo(json.dumps([]))
+    # limpando arquivos .json
+    escreve_arquivo(relatorios=json.dumps([]))
+    escreve_arquivo(alertas=json.dumps([]))
 

@@ -3,26 +3,14 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from relatorios.functions.utils import edita_status, alertas
+from relatorios.functions.utils import edita_status, trata_alerta
 
 
 _email_origem = 'teste.einstein1@gmail.com'
 _password = 'Molotov123'
 
-try:
-    # Configurando a sessão de login pelo protocolo SMTP
-    session = SMTP('smtp.gmail.com', 587)
-    session.starttls()
-    session.login(_email_origem, _password)
-except Exception as e:
-    print(f"PDF não enviado. Erro: \n {e}")
-    alertas.append({"titulo": f"PDF não enviado",
-                    "mensagem": "Certifique-se que a opção de 'Acesso a app menos seguro' "
-                                "está ativada para sua conta.\n Para saber mais:"
-                                "\n https://support.google.com/accounts/answer/6010255"
-                                "\n\n Caso esteja ativada, talvez a sessão esteja sendo "
-                                "bloqueada por algum outro protocolo de segurança no acesso. "
-                                "Verifique a aba de segurança da sua conta"})
+# Configurando a sessão de login pelo protocolo SMTP
+session = None
 
 def logout_email():
     # Após o último relatório a ser enviado, é preciso encerrar a sessão do email
@@ -32,13 +20,19 @@ def logout_email():
 
 def envia_email(texto, email_destino):
     try:
+        session = SMTP('smtp.gmail.com', 587)
+        session.starttls()
+        session.login(_email_origem, _password)
         session.sendmail(_email_origem, email_destino, texto)
     except Exception as e:
-        print('Email não enviado: \n', e)
-        alertas.append({"titulo": f"PDF não enviado",
-                        "mensagem": "Certifique-se que a opção de 'Acesso a app menos seguro' "
-                                    "está ativada para sua conta.\n Para saber mais:"
-                                    "\n https://support.google.com/accounts/answer/6010255"})
+        print(f"Envio por email não permitido. Erro: \n {e}")
+        trata_alerta({"titulo": f"PDF não enviado",
+                      "mensagem": "Certifique-se que a opção de 'Acesso a app menos seguro' está "
+                                  f"ativada para sua conta {_email_origem}.\n Para saber mais:"
+                                  "\n https://support.google.com/accounts/answer/6010255"
+                                  "\n\n Caso esteja ativada, talvez a sessão esteja sendo "
+                                  "bloqueada por algum outro protocolo de segurança no acesso. "
+                                  "\n \nVerifique a aba de segurança da sua conta."})
         return False
     return True
 
@@ -81,3 +75,5 @@ def constroi_email(pdf_aluno, nome_aluno, email_destino, assunto_mensagem = 'Rel
     else:
         edita_status(nome_aluno, 'Não Enviado')
         print(f'!!!NÃO ENVIADO!!!: {nome_aluno}')
+
+    return envio_confirmado

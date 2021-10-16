@@ -9,6 +9,14 @@ setInterval(function() {
                     $("#"+nome_aluno).html(status_aluno);
                 });
             });
+            $.each(response['alertas'], function(){
+                $.each(this, function(titulo, mensagem){
+                    console.log(response['alertas'])
+                    $("#titulo-alerta").html(titulo);
+                    $("#mensagem-alerta").html(mensagem);
+                    $("acionador").trigger( "click" );
+                });
+            });
         },
         error : function(xhr) { console.log('Erro') }
-    })}, 10000)
+    })}, 9800)
